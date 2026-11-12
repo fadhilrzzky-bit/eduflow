@@ -24,9 +24,9 @@ const bars=cs.map(c=>{const t=c.sold+c.st;return `<div class="row"><div class="t
 <div class="track" style="width:${t/mx*100}%"><span style="width:${c.sold/t*100}%;background:var(--a)"></span><span style="width:${c.st/t*100}%;background:var(--c)"></span></div>
 <small class="mute">${c.st} stok tersisa</small></div>`}).join('');
 // line chart
-const W=420,H=200,P=30,top=Math.max(...REV)*1.2,n=REV.length;
+const W=420,H=200,P=30,ymax=Math.max(...REV)*1.2,n=REV.length;
 const mo=[...Array(n)].map((_,i)=>new Date(new Date().getFullYear(),new Date().getMonth()-(n-1-i),1).toLocaleString('id-ID',{month:'short'}));
-const pt=REV.map((v,i)=>[P+i*(W-2*P)/(n-1),H-P-v/top*(H-2*P)]);
+const pt=REV.map((v,i)=>[P+i*(W-2*P)/(n-1),H-P-v/ymax*(H-2*P)]);
 const d=pt.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
 const svg=`<svg viewBox="0 0 ${W} ${H}" style="width:100%"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a78bfa" stop-opacity=".5"/><stop offset="1" stop-color="#a78bfa" stop-opacity="0"/></linearGradient></defs>
 <path d="${d} L${pt[n-1][0]} ${H-P} L${pt[0][0]} ${H-P} Z" fill="url(#g)"/><path d="${d}" fill="none" stroke="#a78bfa" stroke-width="3" stroke-linecap="round"/>`
