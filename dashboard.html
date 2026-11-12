@@ -1,0 +1,43 @@
+<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Dashboard | Graffiti Cans Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css"></head><body>
+<header class="site-header" id="hdr"></header>
+<main class="container stub"><h1>Ringkasan Toko</h1><p class="lead" id="hi"></p>
+<div class="kpis" id="kpis"></div><div class="grid2" id="g2"></div><div class="card" id="top"></div></main>
+<div id="foot"></div>
+<script src="app.js"></script>
+<script>
+const m=guard('admin');document.getElementById('foot').innerHTML=FOOT;
+document.getElementById('hi').textContent='Performa penjualan Graffiti Cans. Halo, '+m.name+'.';
+const sold=PRODUCTS.reduce((a,p)=>a+p.t,0),low=PRODUCTS.filter(p=>p.s<=LOW[p.c]).length,rev=REV.reduce((a,b)=>a+b,0)*1e6;
+const cust=users().filter(u=>u.role==='customer').length;
+document.getElementById('kpis').innerHTML=
+`<div class="kpi" style="--k:var(--b)"><small>Total Pendapatan</small><b class="sm">${rp(rev)}</b><i>${ORDERS} pesanan</i></div>
+<div class="kpi"><small>Produk Aktif</small><b>${PRODUCTS.length}</b><i>${sold} terjual</i></div>
+<div class="kpi" style="--k:var(--c)"><small>Customer</small><b>${cust}</b></div>
+<div class="kpi" style="--k:var(--bad)"><small>Stok Menipis</small><b>${low}</b></div>`;
+// bar per kategori
+const cs=CATS.map((n,i)=>{const ps=PRODUCTS.filter(p=>p.c===i);return{n,sold:ps.reduce((a,p)=>a+p.t,0),st:ps.reduce((a,p)=>a+p.s,0)}}).sort((a,b)=>b.sold-a.sold);
+const mx=Math.max(...cs.map(c=>c.sold+c.st));
+const bars=cs.map(c=>{const t=c.sold+c.st;return `<div class="row"><div class="t"><span>${c.n}</span><span>${c.sold} terjual</span></div>
+<div class="track" style="width:${t/mx*100}%"><span style="width:${c.sold/t*100}%;background:var(--a)"></span><span style="width:${c.st/t*100}%;background:var(--c)"></span></div>
+<small class="mute">${c.st} stok tersisa</small></div>`}).join('');
+// line chart
+const W=420,H=200,P=30,top=Math.max(...REV)*1.2,n=REV.length;
+const mo=[...Array(n)].map((_,i)=>new Date(new Date().getFullYear(),new Date().getMonth()-(n-1-i),1).toLocaleString('id-ID',{month:'short'}));
+const pt=REV.map((v,i)=>[P+i*(W-2*P)/(n-1),H-P-v/top*(H-2*P)]);
+const d=pt.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+const svg=`<svg viewBox="0 0 ${W} ${H}" style="width:100%"><defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a78bfa" stop-opacity=".5"/><stop offset="1" stop-color="#a78bfa" stop-opacity="0"/></linearGradient></defs>
+<path d="${d} L${pt[n-1][0]} ${H-P} L${pt[0][0]} ${H-P} Z" fill="url(#g)"/><path d="${d}" fill="none" stroke="#a78bfa" stroke-width="3" stroke-linecap="round"/>`
++pt.map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="5" fill="#0b1020" stroke="#34d399" stroke-width="3"/>
+<text x="${p[0]}" y="${p[1]-12}" fill="#eef1ff" font-size="12" font-weight="700" text-anchor="middle">${REV[i].toFixed(1).replace('.',',')}</text>
+<text x="${p[0]}" y="${H-8}" fill="#8d96b8" font-size="12" text-anchor="middle">${mo[i]}</text>`).join('')+'</svg>';
+document.getElementById('g2').innerHTML=
+`<div class="card"><h3>Terjual vs Stok</h3><div class="s">Per kategori produk</div>
+<div class="legend"><span><i class="dot" style="background:var(--a)"></i>Terjual</span><span><i class="dot" style="background:var(--c)"></i>Stok</span></div>${bars}</div>
+<div class="card"><h3>Pendapatan</h3><div class="s">6 bulan terakhir (juta Rupiah)</div>${svg}</div>`;
+const tp=[...PRODUCTS].sort((a,b)=>b.t-a.t).slice(0,5);
+document.getElementById('top').innerHTML='<h3>Produk Terlaris</h3><div class="s">Berdasarkan jumlah terjual</div>'+
+tp.map((p,i)=>`<div class="stage"><div class="num">${i+1}</div><div><div class="name">${p.n}</div><div class="bar" style="width:${p.t/tp[0].t*100}%"></div></div><div class="val">${p.t}</div></div>`).join('');
+</script></body></html>

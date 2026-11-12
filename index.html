@@ -1,0 +1,33 @@
+<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Login | Graffiti Cans Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css"></head><body>
+<main class="login-wrap"><div class="login-box">
+<div class="logo">Graffiti<span>Cans</span></div>
+<h2 id="ttl">Back for more paint? 👋</h2>
+<p class="sub" id="sub">Login untuk melanjutkan belanja dan melihat status pesananmu.</p>
+<div id="err" class="alert alert-error" style="display:none"></div>
+<form id="f" class="form" novalidate>
+<div class="field" id="fn" style="display:none"><label>Nama lengkap</label><input id="name" autocomplete="name"></div>
+<div class="field"><label>Username</label><input id="user" autocomplete="username"></div>
+<div class="field"><label>Password</label><input id="pass" type="password" autocomplete="current-password"></div>
+<button class="btn btn-block" id="go">Login</button></form>
+<p class="form-switch"><span id="sw">Belum punya akun?</span> <a href="#" id="tg">Daftar</a></p>
+<p class="hint" style="margin-top:14px;text-align:center">Demo: admin / admin123 &middot; customer / customer123</p>
+</div></main>
+<script src="app.js"></script>
+<script>
+if(me())login(me());
+let reg=false;const $=i=>document.getElementById(i);
+function err(t){$('err').textContent=t;$('err').style.display=t?'block':'none'}
+$('tg').onclick=e=>{e.preventDefault();reg=!reg;err('');$('fn').style.display=reg?'block':'none';
+ $('go').textContent=reg?'Buat akun':'Login';$('tg').textContent=reg?'Login':'Daftar';$('sw').textContent=reg?'Sudah punya akun?':'Belum punya akun?';
+ $('ttl').textContent=reg?'Pick your cans. Hit the wall. 🎨':'Back for more paint? 👋';
+ $('sub').textContent=reg?'Buat akun untuk belanja dan melacak pesananmu.':'Login untuk melanjutkan belanja dan melihat status pesananmu.'};
+$('f').onsubmit=e=>{e.preventDefault();err('');const u=$('user').value.trim().toLowerCase(),p=$('pass').value,n=$('name').value.trim(),all=users();
+ if(!u||!p)return err('Username dan password wajib diisi.');
+ if(reg){if(!n)return err('Nama lengkap wajib diisi.');if(p.length<6)return err('Password minimal 6 karakter.');
+  if(all.some(x=>x.user===u))return err('Username sudah dipakai.');
+  const nu={name:n,user:u,pass:p,role:'customer'};all.push(nu);LS.setItem('gc_users',JSON.stringify(all));return login(nu)}
+ const f=all.find(x=>x.user===u&&x.pass===p);f?login(f):err('Username atau password salah.')};
+</script></body></html>
